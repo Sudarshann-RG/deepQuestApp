@@ -6,3 +6,5 @@ scipy
 pydantic
 newsapi-python
 python-docx
+gunicorn
+uvicorn
