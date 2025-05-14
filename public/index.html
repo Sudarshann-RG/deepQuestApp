@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script
+        src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+        type="module"
+    ></script>
+    <!-- <script
+        src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+        type="module"
+    ></script> -->
+    <title>deepQuest</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="container-2">
+        <h1 id="heading">deepQuest</h1>
+        <div id="subHeadingBlock">
+            <h2 id="subheading">Research Anything</h2>
+            <i id="bookIcon" data-lucide="book-open-text"></i>
+            <i id="linkIcon" data-lucide="link"></i>
+        </div>
+        <div id="responseBlock" class="response-block">
+            <div id="stepsProgressContainer">
+            <ul id="stepsProgressList"></ul>
+             </div>
+            <p id="response"></p>
+        </div>
+        <div class="promptBlock">
+            <input type="text" name="prompt" id="prompt" placeholder="Ask anything" required>
+            <button type="submit" id="submit">
+                <i id="buttonIcon" data-lucide="arrow-big-up"></i>
+            </button>
+        </div>
+    </div>
+    <script src="index.js"></script>
+    
+</body>
+</html>

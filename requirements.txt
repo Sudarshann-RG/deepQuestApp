@@ -1,0 +1,8 @@
+openai
+# python-dotenv
+langgraph
+redis
+scipy
+pydantic
+newsapi-python
+python-docx

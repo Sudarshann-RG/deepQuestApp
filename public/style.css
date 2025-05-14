@@ -1,0 +1,282 @@
+body
+{
+    background-color: #0E0E0F;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+
+    font-family: "Inter", sans-serif;
+    color: #CCCCCC;
+}
+
+#heading
+{
+    font-family: "Inter", sans-serif;
+    color: #CCCCCC;
+    font-size: 3rem;
+    margin: 10px;
+}
+
+#subHeadingBlock
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0E0E0F;
+    gap: 10px;
+}
+
+#subheading
+{
+    font-family: "Inter", sans-serif;
+    color: #CCCCCC;
+}
+
+#bookIcon {
+    width: 24px;
+    height: 24px;
+    stroke: #00C4FF;
+    stroke-width: 2;
+}
+
+#steps
+{
+    text-align: justify;
+    color: #CCCCCC;
+    padding: 15px;
+    list-style-type: none;
+    font-size: 1rem;
+    margin-top: 10px;
+    line-height: 2;
+}
+
+#stepHeading
+{
+    text-align: left;
+}
+
+#stepsProgressContainer {
+  width: 100%;
+  padding: 1rem;
+  padding-bottom: 0;
+}
+
+#stepsProgressList {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.step-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px;
+  font-size: 1rem;
+  color: #ccc;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInStep 0.5s ease forwards;
+}
+
+.step-progress::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: #00C4FF;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@keyframes fadeInStep {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#plan
+{
+    text-align: justify;
+    color: #CCCCCC;
+    padding: 15px;
+}
+
+#container-2
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
+    background-color: #0E0E0F;
+    color: #CCCCCC;
+
+}
+
+.promptBlock
+{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #1A1A1D;
+    border-radius: 1rem;
+}
+
+#responseBlock
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    position: relative;
+    transition: height 1s ease-out;
+    overflow: hidden;
+}
+
+/* .response-block
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px;
+  position: relative;
+  transition: height 1s ease-out;
+  overflow: scroll;
+} */
+
+.progressMessage
+{
+  position: absolute;
+  top: 60%;
+  left: 43%;
+}
+
+#response
+{
+    width: 55em;
+    padding: 20px;
+    text-align: justify;
+    line-height: 2.5;
+    font-size: 1rem;
+    color: #CCCCCC;
+    padding-top: 0;
+}
+
+#response table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+#response th,
+#response td {
+  border: 1px solid #444;
+  padding: 10px;
+  text-align: left;
+  color: #ccc;
+}
+
+#response th {
+  background-color: #222;
+  font-weight: bold;
+}
+
+#response tr:nth-child(even) {
+  background-color: #1A1A1D;
+}
+
+#response h2, 
+#response h3, 
+#response h4 {
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+}
+
+#response h1
+{
+    margin-bottom: 0.6em;
+}
+
+#response p {
+  margin-bottom: 1em;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+#linkIcon{
+  width: 24px;
+  height: 24px;
+  stroke: #00C4FF;
+  stroke-width: 2;
+}
+
+#response a {
+  color: #00C4FF;
+}
+
+#prompt
+{
+    height: 35px;
+    width: 45em;
+    font-size: large;
+
+    border-radius: 1rem;
+    border: none;
+    outline: 0;
+    padding: 10px;
+    position: relative;
+
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+
+    background-color: #1A1A1D;
+    color: #CCCCCC;
+}
+
+button
+{
+    height: 55px;
+    width: 55px;
+    padding: 10px;
+    font-size: x-large;
+    
+    border-radius: 1rem;
+    background-color: #00C4FF;
+    border: none;
+
+    /* position: absolute;
+    left: 50em; */
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+button:hover
+{
+    height: 55px;
+    width: 55px;
+    padding: 10px;
+    font-size: x-large;
+    
+    border-radius: 1rem;
+    background-color: #00C4FF;
+    opacity: 0.6;
+
+    /* position: absolute;
+    left: 50em; */
+}
+
+#buttonIcon {
+    width: 24px;
+    height: 24px;
+    stroke: #0E0E0F;
+    stroke-width: 2;
+}
