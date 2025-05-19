@@ -13,3 +13,4 @@ pydantic
 typing-extensions
 langgraph
 python-docx
+crawl4ai

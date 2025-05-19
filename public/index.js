@@ -7,7 +7,7 @@ document.getElementById("submit").addEventListener("click", async function(e) {
     document.querySelector('#stepsProgressList').innerHTML = "";
     document.querySelector('button').style.color = "grey";
     document.querySelector('.promptBlock').style.opacity = "0.5";
-
+    
     var responseBlock = document.querySelector('#responseBlock');
     responseBlock.style.height = "0";
     void responseBlock.offsetHeight; 
@@ -31,11 +31,10 @@ document.getElementById("submit").addEventListener("click", async function(e) {
     document.querySelector('.promptBlock').style.order = "4";
     document.querySelector('#responseBlock').style.order = "3";
     document.querySelector('#container-2').style.justifyContent = "flex-start";
-    document.querySelector('.promptBlock').style.marginBottom = "20px";
-    document.querySelector('.promptBlock').style.position = "static";
     document.querySelector('.promptBlock').style.justifySelf = "flex-end";
 
     const prompt = document.getElementById("prompt").value;
+    document.getElementById("prompt").value = "";
     try {
         const response = await fetch("/api/research", {
             method: "POST",
@@ -69,6 +68,12 @@ document.getElementById("submit").addEventListener("click", async function(e) {
             document.getElementById('responseBlock').style.borderRadius = "1rem";
             document.getElementById('response').style.height = "max-content";
             document.getElementById("response").innerHTML = html;
+            
+            var downloadButton = document.createElement("button");
+            downloadButton.className = "download-button";
+            responseBlock.appendChild(downloadButton);
+            document.querySelector('.download-button').innerHTML = 'Download Report <i id="download-icon" data-lucide="download"></i>';
+
             void responseBlock.offsetHeight; 
             document.querySelector(".response-block").style.height = 'auto';
 
@@ -132,3 +137,10 @@ function renderMarkdownSteps(length, data) {
 window.onload = () => {
     lucide.createIcons();
 }
+
+document.getElementById("prompt").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); 
+        document.getElementById("submit").click(); 
+    }
+});

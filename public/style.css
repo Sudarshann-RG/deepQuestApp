@@ -3,6 +3,7 @@ body
     background-color: #0E0E0F;
     margin: 0;
     display: flex;
+    justify-content: center;
     height: 100vh;
 
     font-family: "Inter", sans-serif;
@@ -123,9 +124,11 @@ body
 {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     background-color: #1A1A1D;
     border-radius: 1rem;
+    position: fixed;
+    bottom: 2%;
 }
 
 #responseBlock
@@ -135,6 +138,7 @@ body
     align-items: center;
     flex-direction: column;
     padding: 20px;
+    padding-bottom: 70px;
     position: relative;
     transition: height 1s ease-out;
     overflow: hidden;
@@ -274,7 +278,45 @@ button:hover
     left: 50em; */
 }
 
+.download-button
+{
+    height: 55px;
+    width: max-content;
+    padding: 10px;
+    font-size: large;
+
+    align-self: flex-start;
+    
+    border-radius: 1rem;
+    background-color: #00C4FF;
+    border: none;
+
+    cursor: pointer;
+    transition-duration: 0.4s;
+}
+
+.download-button:hover
+{
+  height: 55px;
+  width: max-content;
+  padding: 10px;
+  font-size: large;
+
+  align-self: flex-start;
+    
+  border-radius: 1rem;
+  background-color: #00C4FF;
+  opacity: 0.6;
+}
+
 #buttonIcon {
+    width: 24px;
+    height: 24px;
+    stroke: #0E0E0F;
+    stroke-width: 2;
+}
+
+#download-icon {
     width: 24px;
     height: 24px;
     stroke: #0E0E0F;

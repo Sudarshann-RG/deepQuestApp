@@ -105,7 +105,7 @@ def research_task(task: str, plan: List[str]) -> str:
 
 def write_task(task: str, research_result: str) -> str:
     """Generate the final output for the task based on the research."""
-    write_prompt = f"Based on the following research:\n{research_result}\n\nWrite a detailed and well-structured response for the task: {task}\n You should write it as a research section"
+    write_prompt = f"Based on the following research:\n{research_result}\n\nWrite a detailed and well-structured response with proper section like Section 1, Section-2 and so on and sub-section like Section 1.1, Section 1.2 and so on for the task: {task}\n You should write it as a research section"
     response = client.chat.completions.create(
         model="gpt-4.1",
         messages=[
