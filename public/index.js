@@ -1,4 +1,3 @@
-
 document.getElementById("submit").addEventListener("click", async function(e) {
     e.preventDefault(); 
     console.log("Button clicked!");
@@ -73,7 +72,25 @@ document.getElementById("submit").addEventListener("click", async function(e) {
             downloadButton.className = "download-button";
             responseBlock.appendChild(downloadButton);
             document.querySelector('.download-button').innerHTML = 'Download Report <i id="download-icon" data-lucide="download"></i>';
+            downloadButton.addEventListener("click", async () => {
+                const { Document, Packer, Paragraph } = window.docx;
+                const doc = new Document();
 
+                const markdownText = data.response;
+                const plainText = markdownText.replace(/[#*_>~`-]/g, '');
+
+                const paragraph = new Paragraph(plainText);
+                doc.addSection({ children: [paragraph] });
+
+                const blob = await Packer.toBlob(doc);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "deepQuest_Report.docx";
+                a.click();
+                URL.revokeObjectURL(url);
+
+            });
             void responseBlock.offsetHeight; 
             document.querySelector(".response-block").style.height = 'auto';
 
