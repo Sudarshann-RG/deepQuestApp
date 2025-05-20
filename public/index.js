@@ -89,66 +89,99 @@ document.getElementById("submit").addEventListener("click", async function(e) {
                     const lines = markdown.split('\n');
                     const paragraphs = [];
 
-                    for (const line of lines) {
-                        const trimmed = line.trim();
+                    let currentParagraph = null;
+                    let carryoverLinkText = null;
 
-                        // Headings
-                        if (trimmed.startsWith('### ')) {
-                            paragraphs.push(new docx.Paragraph({
-                                text: trimmed.slice(4),
-                                heading: docx.HeadingLevel.HEADING_3,
-                                spacing: { after: 200 }
-                            }));
-                        } else if (trimmed.startsWith('## ')) {
-                            paragraphs.push(new docx.Paragraph({
-                                text: trimmed.slice(3),
-                                heading: docx.HeadingLevel.HEADING_2,
-                                spacing: { after: 200 }
-                            }));
-                        } else if (trimmed.startsWith('# ')) {
-                            paragraphs.push(new docx.Paragraph({
-                                text: trimmed.slice(2),
-                                heading: docx.HeadingLevel.HEADING_1,
-                                spacing: { after: 300 }
-                            }));
-                        } else if (trimmed === '---') {
-                            paragraphs.push(new docx.Paragraph({ spacing: { after: 300 } }));
-                        } else if (trimmed.length > 0) {
-                            const runs = [];
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
 
-                            // Parse and convert Markdown syntax inline
-                            const pattern = /\[([^\]]+)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*/g;
-                            let match;
-                            let lastIndex = 0;
-
-                            while ((match = pattern.exec(trimmed)) !== null) {
-                                if (match.index > lastIndex) {
-                                    runs.push(new docx.TextRun(trimmed.substring(lastIndex, match.index)));
-                                }
-
-                                if (match[1] && match[2]) {
-                                    runs.push(new docx.ExternalHyperlink({
-                                        link: match[2],
-                                        children: [new docx.TextRun({ text: match[1], style: "Hyperlink" })]
-                                    }));
-                                } else if (match[3]) {
-                                    runs.push(new docx.TextRun({ text: match[3], bold: true }));
-                                } else if (match[4]) {
-                                    runs.push(new docx.TextRun({ text: match[4], italics: true }));
-                                }
-
-                                lastIndex = pattern.lastIndex;
+                        if (!line) {
+                            if (currentParagraph) {
+                                paragraphs.push(currentParagraph);
+                                currentParagraph = null;
                             }
-
-                            if (lastIndex < trimmed.length) {
-                                runs.push(new docx.TextRun(trimmed.substring(lastIndex)));
-                            }
-
-                            paragraphs.push(new docx.Paragraph({
-                                children: runs,
-                                spacing: { after: 200 }
-                            }));
+                            continue;
                         }
+
+                        const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : null;
+
+                        // Heading detection
+                        const headingMatch = /^(#{1,4})\s+(.*)/.exec(line);
+                        if (headingMatch) {
+                            const level = headingMatch[1].length;
+                            const content = headingMatch[2];
+
+                            paragraphs.push(new docx.Paragraph({
+                                text: content,
+                                heading: docx[`HeadingLevel`][`HEADING_${level}`],
+                                spacing: { after: 100 + (level * 50) }
+                            }));
+                            continue;
+                        }
+
+                        const runs = [];
+                        let lastIndex = 0;
+
+                        const regex = /(\[([^\]]+)\]\(([^)]+)\))|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|([^\s]+\s*\(https?:\/\/[^\s)]+\))/g;
+                        let match;
+
+                        while ((match = regex.exec(line)) !== null) {
+                            // Add plain text before this match
+                            if (match.index > lastIndex) {
+                                runs.push(new docx.TextRun(line.substring(lastIndex, match.index)));
+                            }
+
+                            if (match[1]) {
+                                // [text](url)
+                                runs.push(new docx.ExternalHyperlink({
+                                    link: match[3],
+                                    children: [new docx.TextRun({ text: match[2], style: "Hyperlink" })]
+                                }));
+                            } else if (match[4]) {
+                                // **bold**
+                                runs.push(new docx.TextRun({ text: match[5], bold: true }));
+                            } else if (match[6]) {
+                                // *italic*
+                                runs.push(new docx.TextRun({ text: match[7], italics: true }));
+                            } else if (match[8]) {
+                                // `code`
+                                runs.push(new docx.TextRun({ text: match[9], font: "Courier New", size: 20 }));
+                            } else if (match[10]) {
+                                // "Text (https://...)" pattern
+                                const textMatch = match[10].match(/^(.+?)\s*\((https?:\/\/[^\s)]+)\)/);
+                                if (textMatch) {
+                                    runs.push(new docx.ExternalHyperlink({
+                                        link: textMatch[2],
+                                        children: [new docx.TextRun({ text: textMatch[1], style: "Hyperlink" })]
+                                    }));
+                                } else {
+                                    runs.push(new docx.TextRun(match[10]));
+                                }
+                            }
+
+                            lastIndex = regex.lastIndex;
+                        }
+
+                        // Add trailing text if any
+                        if (lastIndex < line.length) {
+                            runs.push(new docx.TextRun(line.substring(lastIndex)));
+                        }
+
+                        // Handle "Link label" followed by "https://..." on next line
+                        if (/^\w.+:$/.test(line) && nextLine && /^https?:\/\//.test(nextLine)) {
+                            runs.push(new docx.ExternalHyperlink({
+                                link: nextLine,
+                                children: [new docx.TextRun({ text: line.replace(':', ''), style: "Hyperlink" })]
+                            }));
+                            i++; // Skip the URL line
+                        }
+
+                        currentParagraph = new docx.Paragraph({
+                            children: runs,
+                            spacing: { after: 200 }
+                        });
+                        paragraphs.push(currentParagraph);
+                        currentParagraph = null;
                     }
 
                     return paragraphs;
