@@ -73,6 +73,11 @@ document.getElementById("submit").addEventListener("click", async function(e) {
             responseBlock.appendChild(downloadButton);
             document.querySelector('.download-button').innerHTML = 'Download Report <i id="download-icon" data-lucide="download"></i>';
             downloadButton.addEventListener("click", async () => {
+                if (!window.docx) {
+                    alert("Failed to load document generator. Please refresh the page and try again.");
+                    return;
+                }
+                
                 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
                 
                 function markdownToDocxParagraphs(markdown) {
@@ -111,7 +116,7 @@ document.getElementById("submit").addEventListener("click", async function(e) {
 
                     return paragraphs;
                 }
-                
+
                 try {
                     // Create a new Document with proper structure
                     const doc = new Document({
