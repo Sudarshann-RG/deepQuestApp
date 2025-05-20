@@ -2,6 +2,11 @@ document.getElementById("submit").addEventListener("click", async function(e) {
     e.preventDefault(); 
     console.log("Button clicked!");
 
+    if(document.querySelector('.download-button') != undefined)
+    {
+        document.querySelector('.download-button').remove();
+    }
+
     document.querySelector('#response').innerHTML = "";
     document.querySelector('#stepsProgressList').innerHTML = "";
     document.querySelector('button').style.color = "grey";
@@ -77,7 +82,7 @@ document.getElementById("submit").addEventListener("click", async function(e) {
                     alert("Failed to load document generator. Please refresh the page and try again.");
                     return;
                 }
-                
+
                 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
                 
                 function markdownToDocxParagraphs(markdown) {
@@ -85,30 +90,62 @@ document.getElementById("submit").addEventListener("click", async function(e) {
                     const paragraphs = [];
 
                     for (const line of lines) {
-                        if (line.startsWith('### ')) {
-                            paragraphs.push(new Paragraph({
-                                text: line.replace('### ', ''),
-                                heading: HeadingLevel.HEADING_3,
+                        const trimmed = line.trim();
+
+                        // Headings
+                        if (trimmed.startsWith('### ')) {
+                            paragraphs.push(new docx.Paragraph({
+                                text: trimmed.slice(4),
+                                heading: docx.HeadingLevel.HEADING_3,
                                 spacing: { after: 200 }
                             }));
-                        } else if (line.startsWith('## ')) {
-                            paragraphs.push(new Paragraph({
-                                text: line.replace('## ', ''),
-                                heading: HeadingLevel.HEADING_2,
+                        } else if (trimmed.startsWith('## ')) {
+                            paragraphs.push(new docx.Paragraph({
+                                text: trimmed.slice(3),
+                                heading: docx.HeadingLevel.HEADING_2,
                                 spacing: { after: 200 }
                             }));
-                        } else if (line.startsWith('# ')) {
-                            paragraphs.push(new Paragraph({
-                                text: line.replace('# ', ''),
-                                heading: HeadingLevel.HEADING_1,
+                        } else if (trimmed.startsWith('# ')) {
+                            paragraphs.push(new docx.Paragraph({
+                                text: trimmed.slice(2),
+                                heading: docx.HeadingLevel.HEADING_1,
                                 spacing: { after: 300 }
                             }));
-                        } else if (line.trim() === '---') {
-                            // Horizontal rule as empty space
-                            paragraphs.push(new Paragraph({ spacing: { after: 300 } }));
-                        } else if (line.trim().length > 0) {
-                            paragraphs.push(new Paragraph({
-                                children: [new TextRun(line)],
+                        } else if (trimmed === '---') {
+                            paragraphs.push(new docx.Paragraph({ spacing: { after: 300 } }));
+                        } else if (trimmed.length > 0) {
+                            const runs = [];
+
+                            // Parse and convert Markdown syntax inline
+                            const pattern = /\[([^\]]+)\]\(([^)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*/g;
+                            let match;
+                            let lastIndex = 0;
+
+                            while ((match = pattern.exec(trimmed)) !== null) {
+                                if (match.index > lastIndex) {
+                                    runs.push(new docx.TextRun(trimmed.substring(lastIndex, match.index)));
+                                }
+
+                                if (match[1] && match[2]) {
+                                    runs.push(new docx.ExternalHyperlink({
+                                        link: match[2],
+                                        children: [new docx.TextRun({ text: match[1], style: "Hyperlink" })]
+                                    }));
+                                } else if (match[3]) {
+                                    runs.push(new docx.TextRun({ text: match[3], bold: true }));
+                                } else if (match[4]) {
+                                    runs.push(new docx.TextRun({ text: match[4], italics: true }));
+                                }
+
+                                lastIndex = pattern.lastIndex;
+                            }
+
+                            if (lastIndex < trimmed.length) {
+                                runs.push(new docx.TextRun(trimmed.substring(lastIndex)));
+                            }
+
+                            paragraphs.push(new docx.Paragraph({
+                                children: runs,
                                 spacing: { after: 200 }
                             }));
                         }
