@@ -29,7 +29,6 @@ document.getElementById("submit").addEventListener("click", async function(e) {
         dotlottiePlayer.setAttribute('loop', '');
         dotlottiePlayer.setAttribute('speed', '1');
         dotlottiePlayer.setAttribute('background', 'transparent');
-        // dotlottiePlayer.setAttribute('style', 'width: 200px; height: 200px; position: absolute; top: 17%; left: 40%; ransform: translate(-50%, -50%); z-index: 9999;');
         dotlottiePlayer.className = 'lottie-spinner';
         document.querySelector('#responseBlock').appendChild(dotlottiePlayer);
 
