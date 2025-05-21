@@ -144,17 +144,14 @@ body
     overflow: hidden;
 }
 
-/* .response-block
-{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 20px;
-  position: relative;
-  transition: height 1s ease-out;
-  overflow: scroll;
-} */
+.lottie-spinner {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: 17%;
+  left: 40%;
+  z-index: 9999;
+}
 
 .progressMessage
 {
@@ -321,4 +318,9 @@ button:hover
     height: 24px;
     stroke: #0E0E0F;
     stroke-width: 2;
+}
+
+.response-block.expanded {
+  height: 500px;
+  transition: height 1s ease-out;
 }

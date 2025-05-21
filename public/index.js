@@ -1,18 +1,23 @@
+const submitBtn = document.getElementById("submit");
+const promptInput = document.getElementById("prompt");
+const responseBlock = document.getElementById("responseBlock");
+const responseEl = document.getElementById("response");
+const stepsList = document.getElementById("stepsProgressList");
+const promptBlock = document.querySelector(".promptBlock");
+const container = document.getElementById("container-2");
+
 document.getElementById("submit").addEventListener("click", async function(e) {
     e.preventDefault(); 
     console.log("Button clicked!");
 
-    if(document.querySelector('.download-button') != undefined)
-    {
-        document.querySelector('.download-button').remove();
-    }
+    const oldBtn = document.querySelector('.download-button');
+    if (oldBtn) oldBtn.remove();
 
-    document.querySelector('#response').innerHTML = "";
-    document.querySelector('#stepsProgressList').innerHTML = "";
-    document.querySelector('button').style.color = "grey";
-    document.querySelector('.promptBlock').style.opacity = "0.5";
+    responseEl.innerHTML = "";
+    stepsList.innerHTML = "";
+    submitBtn.style.color = "grey";
+    promptBlock.style.opacity = "0.5";
     
-    var responseBlock = document.querySelector('#responseBlock');
     responseBlock.style.height = "0";
     void responseBlock.offsetHeight; 
     responseBlock.style.height = "500px";
@@ -24,21 +29,23 @@ document.getElementById("submit").addEventListener("click", async function(e) {
         dotlottiePlayer.setAttribute('loop', '');
         dotlottiePlayer.setAttribute('speed', '1');
         dotlottiePlayer.setAttribute('background', 'transparent');
-        dotlottiePlayer.setAttribute('style', 'width: 200px; height: 200px; position: absolute; top: 17%; left: 40%; ransform: translate(-50%, -50%); z-index: 9999;');
+        // dotlottiePlayer.setAttribute('style', 'width: 200px; height: 200px; position: absolute; top: 17%; left: 40%; ransform: translate(-50%, -50%); z-index: 9999;');
+        dotlottiePlayer.className = 'lottie-spinner';
         document.querySelector('#responseBlock').appendChild(dotlottiePlayer);
+
         var progressMessage = document.createElement('p');
         progressMessage.className = "progress-message";
         progressMessage.innerHTML = "Generating Report....";
-        document.querySelector('#responseBlock').appendChild(progressMessage);
-    }, 1000);
+        responseBlock.appendChild(progressMessage);
+    }, 500);
 
-    document.querySelector('.promptBlock').style.order = "4";
-    document.querySelector('#responseBlock').style.order = "3";
-    document.querySelector('#container-2').style.justifyContent = "flex-start";
-    document.querySelector('.promptBlock').style.justifySelf = "flex-end";
+    promptBlock.style.order = "4";
+    responseBlock.style.order = "3";
+    container.style.justifyContent = "flex-start";
+    promptBlock.style.justifySelf = "flex-end";
 
-    const prompt = document.getElementById("prompt").value;
-    document.getElementById("prompt").value = "";
+    const prompt = promptInput.value.trim();
+    promptInput.value = "";
     try {
         const response = await fetch("/api/research", {
             method: "POST",
@@ -59,162 +66,163 @@ document.getElementById("submit").addEventListener("click", async function(e) {
         document.querySelector('dotlottie-player').remove();
         document.querySelector('.progress-message').remove();
 
-        document.querySelector('.promptBlock').style.opacity = "1";
-        document.querySelector('#container-2').style.height = "max-content";
+        promptBlock.style.opacity = "1";
+        container.style.height = "max-content";
         await renderMarkdownSteps(data.past_steps[0].length, data);
 
         setTimeout(async () => {
             const markdown = data.response;
-            const html = marked.parse(markdown);
+            const html = DOMPurify.sanitize(marked.parse(markdown));
 
-            document.getElementById('responseBlock').style.width = "55em";
-            document.getElementById('responseBlock').style.margin = "20px";
-            document.getElementById('responseBlock').style.borderRadius = "1rem";
-            document.getElementById('response').style.height = "max-content";
-            document.getElementById("response").innerHTML = html;
+            responseBlock.style.width = "55em";
+            responseBlock.style.margin = "20px";
+            responseBlock.style.borderRadius = "1rem";
+            responseEl.style.height = "max-content";
+            responseEl.innerHTML = html;
             
             var downloadButton = document.createElement("button");
             downloadButton.className = "download-button";
+            downloadButton.innerHTML = 'Download Report <i id="download-icon" data-lucide="download"></i>';
             responseBlock.appendChild(downloadButton);
-            document.querySelector('.download-button').innerHTML = 'Download Report <i id="download-icon" data-lucide="download"></i>';
-            downloadButton.addEventListener("click", async () => {
-                if (!window.docx) {
-                    alert("Failed to load document generator. Please refresh the page and try again.");
-                    return;
-                }
+            
+            downloadButton.addEventListener("click", async () => generateDocx(prompt, data.response));
+            //     if (!window.docx) {
+            //         alert("Failed to load document generator. Please refresh the page and try again.");
+            //         return;
+            //     }
 
-                const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+            //     const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
                 
-                function markdownToDocxParagraphs(markdown) {
-                    const lines = markdown.split('\n');
-                    const paragraphs = [];
+            //     function markdownToDocxParagraphs(markdown) {
+            //         const lines = markdown.split('\n');
+            //         const paragraphs = [];
 
-                    let currentParagraph = null;
-                    let carryoverLinkText = null;
+            //         let currentParagraph = null;
+            //         let carryoverLinkText = null;
 
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i].trim();
+            //         for (let i = 0; i < lines.length; i++) {
+            //             const line = lines[i].trim();
 
-                        if (!line) {
-                            if (currentParagraph) {
-                                paragraphs.push(currentParagraph);
-                                currentParagraph = null;
-                            }
-                            continue;
-                        }
+            //             if (!line) {
+            //                 if (currentParagraph) {
+            //                     paragraphs.push(currentParagraph);
+            //                     currentParagraph = null;
+            //                 }
+            //                 continue;
+            //             }
 
-                        const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : null;
+            //             const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : null;
 
-                        // Heading detection
-                        const headingMatch = /^(#{1,4})\s+(.*)/.exec(line);
-                        if (headingMatch) {
-                            const level = headingMatch[1].length;
-                            const content = headingMatch[2];
+            //             // Heading detection
+            //             const headingMatch = /^(#{1,4})\s+(.*)/.exec(line);
+            //             if (headingMatch) {
+            //                 const level = headingMatch[1].length;
+            //                 const content = headingMatch[2];
 
-                            paragraphs.push(new docx.Paragraph({
-                                text: content,
-                                heading: docx[`HeadingLevel`][`HEADING_${level}`],
-                                spacing: { after: 100 + (level * 50) }
-                            }));
-                            continue;
-                        }
+            //                 paragraphs.push(new docx.Paragraph({
+            //                     text: content,
+            //                     heading: docx[`HeadingLevel`][`HEADING_${level}`],
+            //                     spacing: { after: 100 + (level * 50) }
+            //                 }));
+            //                 continue;
+            //             }
 
-                        const runs = [];
-                        let lastIndex = 0;
+            //             const runs = [];
+            //             let lastIndex = 0;
 
-                        const regex = /(\[([^\]]+)\]\(([^)]+)\))|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|([^\s]+\s*\(https?:\/\/[^\s)]+\))/g;
-                        let match;
+            //             const regex = /(\[([^\]]+)\]\(([^)]+)\))|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|([^\s]+\s*\(https?:\/\/[^\s)]+\))/g;
+            //             let match;
 
-                        while ((match = regex.exec(line)) !== null) {
-                            // Add plain text before this match
-                            if (match.index > lastIndex) {
-                                runs.push(new docx.TextRun(line.substring(lastIndex, match.index)));
-                            }
+            //             while ((match = regex.exec(line)) !== null) {
+            //                 // Add plain text before this match
+            //                 if (match.index > lastIndex) {
+            //                     runs.push(new docx.TextRun(line.substring(lastIndex, match.index)));
+            //                 }
 
-                            if (match[1]) {
-                                // [text](url)
-                                runs.push(new docx.ExternalHyperlink({
-                                    link: match[3],
-                                    children: [new docx.TextRun({ text: match[2], style: "Hyperlink" })]
-                                }));
-                            } else if (match[4]) {
-                                // **bold**
-                                runs.push(new docx.TextRun({ text: match[5], bold: true }));
-                            } else if (match[6]) {
-                                // *italic*
-                                runs.push(new docx.TextRun({ text: match[7], italics: true }));
-                            } else if (match[8]) {
-                                // `code`
-                                runs.push(new docx.TextRun({ text: match[9], font: "Courier New", size: 20 }));
-                            } else if (match[10]) {
-                                // "Text (https://...)" pattern
-                                const textMatch = match[10].match(/^(.+?)\s*\((https?:\/\/[^\s)]+)\)/);
-                                if (textMatch) {
-                                    runs.push(new docx.ExternalHyperlink({
-                                        link: textMatch[2],
-                                        children: [new docx.TextRun({ text: textMatch[1], style: "Hyperlink" })]
-                                    }));
-                                } else {
-                                    runs.push(new docx.TextRun(match[10]));
-                                }
-                            }
+            //                 if (match[1]) {
+            //                     // [text](url)
+            //                     runs.push(new docx.ExternalHyperlink({
+            //                         link: match[3],
+            //                         children: [new docx.TextRun({ text: match[2], style: "Hyperlink" })]
+            //                     }));
+            //                 } else if (match[4]) {
+            //                     // **bold**
+            //                     runs.push(new docx.TextRun({ text: match[5], bold: true }));
+            //                 } else if (match[6]) {
+            //                     // *italic*
+            //                     runs.push(new docx.TextRun({ text: match[7], italics: true }));
+            //                 } else if (match[8]) {
+            //                     // `code`
+            //                     runs.push(new docx.TextRun({ text: match[9], font: "Courier New", size: 20 }));
+            //                 } else if (match[10]) {
+            //                     // "Text (https://...)" pattern
+            //                     const textMatch = match[10].match(/^(.+?)\s*\((https?:\/\/[^\s)]+)\)/);
+            //                     if (textMatch) {
+            //                         runs.push(new docx.ExternalHyperlink({
+            //                             link: textMatch[2],
+            //                             children: [new docx.TextRun({ text: textMatch[1], style: "Hyperlink" })]
+            //                         }));
+            //                     } else {
+            //                         runs.push(new docx.TextRun(match[10]));
+            //                     }
+            //                 }
 
-                            lastIndex = regex.lastIndex;
-                        }
+            //                 lastIndex = regex.lastIndex;
+            //             }
 
-                        // Add trailing text if any
-                        if (lastIndex < line.length) {
-                            runs.push(new docx.TextRun(line.substring(lastIndex)));
-                        }
+            //             // Add trailing text if any
+            //             if (lastIndex < line.length) {
+            //                 runs.push(new docx.TextRun(line.substring(lastIndex)));
+            //             }
 
-                        // Handle "Link label" followed by "https://..." on next line
-                        if (/^\w.+:$/.test(line) && nextLine && /^https?:\/\//.test(nextLine)) {
-                            runs.push(new docx.ExternalHyperlink({
-                                link: nextLine,
-                                children: [new docx.TextRun({ text: line.replace(':', ''), style: "Hyperlink" })]
-                            }));
-                            i++; // Skip the URL line
-                        }
+            //             // Handle "Link label" followed by "https://..." on next line
+            //             if (/^\w.+:$/.test(line) && nextLine && /^https?:\/\//.test(nextLine)) {
+            //                 runs.push(new docx.ExternalHyperlink({
+            //                     link: nextLine,
+            //                     children: [new docx.TextRun({ text: line.replace(':', ''), style: "Hyperlink" })]
+            //                 }));
+            //                 i++; // Skip the URL line
+            //             }
 
-                        currentParagraph = new docx.Paragraph({
-                            children: runs,
-                            spacing: { after: 200 }
-                        });
-                        paragraphs.push(currentParagraph);
-                        currentParagraph = null;
-                    }
+            //             currentParagraph = new docx.Paragraph({
+            //                 children: runs,
+            //                 spacing: { after: 200 }
+            //             });
+            //             paragraphs.push(currentParagraph);
+            //             currentParagraph = null;
+            //         }
 
-                    return paragraphs;
-                }
+            //         return paragraphs;
+            //     }
 
-                try {
-                    // Create a new Document with proper structure
-                    const doc = new Document({
-                        creator: "deepQuest",
-                        title: "Research Report",
-                        description: "Generated by deepQuest AI",
-                        sections: [{
-                            properties: {},
-                            children: [
-                                new Paragraph({
-                                    text: "Research Report: " + prompt,
-                                    heading: HeadingLevel.HEADING_1,
-                                    spacing: { after: 200 },
-                                }),
-                                ...markdownToDocxParagraphs(data.response)
-                            ],
-                        }],
-                    });
+            //     try {
+            //         // Create a new Document with proper structure
+            //         const doc = new Document({
+            //             creator: "deepQuest",
+            //             title: "Research Report",
+            //             description: "Generated by deepQuest AI",
+            //             sections: [{
+            //                 properties: {},
+            //                 children: [
+            //                     new Paragraph({
+            //                         text: "Research Report: " + prompt,
+            //                         heading: HeadingLevel.HEADING_1,
+            //                         spacing: { after: 200 },
+            //                     }),
+            //                     ...markdownToDocxParagraphs(data.response)
+            //                 ],
+            //             }],
+            //         });
 
-                    // Generate and download the document
-                    const blob = await Packer.toBlob(doc);
-                    saveAs(blob, "deepQuest_Report.docx");
-                } catch (err) {
-                    console.error("Error generating document:", err);
-                    alert("Failed to generate document. Please try again.");
-                }
+            //         // Generate and download the document
+            //         const blob = await Packer.toBlob(doc);
+            //         saveAs(blob, "deepQuest_Report.docx");
+            //     } catch (err) {
+            //         console.error("Error generating document:", err);
+            //         alert("Failed to generate document. Please try again.");
+            //     }
 
-            });
+            // });
             void responseBlock.offsetHeight; 
             document.querySelector(".response-block").style.height = 'auto';
 
@@ -231,7 +239,7 @@ document.getElementById("submit").addEventListener("click", async function(e) {
                 });
                 lucide.createIcons();
             }, 0);
-            document.getElementById("response").style.margin = '0px';
+            responseEl.style.margin = '0px';
         });
 
     } catch (error) {
@@ -274,6 +282,65 @@ function renderMarkdownSteps(length, data) {
         }
     });
 }
+
+function markdownToDocxParagraphs(markdown) {
+    const { Paragraph, TextRun, ExternalHyperlink, HeadingLevel } = window.docx;
+    const lines = markdown.split('\n');
+    const paragraphs = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const nextLine = lines[i + 1]?.trim();
+
+        if (!line) continue;
+
+        const headingMatch = /^(#{1,4})\s+(.*)/.exec(line);
+        if (headingMatch) {
+            paragraphs.push(new Paragraph({
+                text: headingMatch[2],
+                heading: HeadingLevel[`HEADING_${headingMatch[1].length}`],
+                spacing: { after: 100 }
+            }));
+            continue;
+        }
+
+        const runs = [];
+        let match;
+        const regex = /(\[([^\]]+)\]\(([^)]+)\))|(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(`([^`]+)`)|([^\s]+\s*\(https?:\/\/[^\s)]+\))/g;
+        let lastIndex = 0;
+        while ((match = regex.exec(line)) !== null) {
+            if (match.index > lastIndex) runs.push(new TextRun(line.substring(lastIndex, match.index)));
+            if (match[1]) runs.push(new ExternalHyperlink({ link: match[3], children: [new TextRun({ text: match[2], style: "Hyperlink" })] }));
+            else if (match[4]) runs.push(new TextRun({ text: match[5], bold: true }));
+            else if (match[6]) runs.push(new TextRun({ text: match[7], italics: true }));
+            else if (match[8]) runs.push(new TextRun({ text: match[9], font: "Courier New", size: 20 }));
+            lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < line.length) runs.push(new TextRun(line.substring(lastIndex)));
+        paragraphs.push(new Paragraph({ children: runs, spacing: { after: 200 } }));
+    }
+
+    return paragraphs;
+}
+
+async function generateDocx(prompt, markdown) {
+    const { Document, Packer, Paragraph, HeadingLevel } = window.docx;
+    const doc = new Document({
+        creator: "deepQuest",
+        title: "Research Report",
+        description: "Generated by deepQuest AI",
+        sections: [{
+            properties: {},
+            children: [
+                new Paragraph({ text: "Research Report: " + prompt, heading: HeadingLevel.HEADING_1, spacing: { after: 200 } }),
+                ...markdownToDocxParagraphs(markdown)
+            ]
+        }]
+    });
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, "deepQuest_Report.docx");
+}
+
 
 window.onload = () => {
     lucide.createIcons();
