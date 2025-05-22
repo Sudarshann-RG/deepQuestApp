@@ -1,52 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script
-        src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
-        type="module"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
-    <script src="
-        https://cdn.jsdelivr.net/npm/docx@9.5.0/dist/index.iife.min.js">
-    </script>
+  <title>deepQuest</title>
+  <link rel="stylesheet" href="style.css" />
 
-    <!-- <script
-        src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
-        type="module"
-    ></script> -->
-    <title>deepQuest</title>
-    <link rel="stylesheet" href="style.css">
+  <!-- External libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@9.5.0/dist/index.iife.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
 </head>
+
 <body>
-    <div id="container-2">
-        <h1 id="heading">deepQuest</h1>
-        <div id="subHeadingBlock">
-            <h2 id="subheading">Research Anything</h2>
-            <i id="bookIcon" data-lucide="book-open-text"></i>
-            <i id="linkIcon" data-lucide="link"></i>
-        </div>
-        <div id="responseBlock" class="response-block">
-            <div id="stepsProgressContainer">
-                <ul id="stepsProgressList"></ul>
-            </div>
-            <p id="response"></p>
-        </div>
-    </div>
-    <div class="promptBlock">
-            <input type="text" name="prompt" id="prompt" placeholder="Ask anything" required>
-            <button type="submit" id="submit">
-                <i id="buttonIcon" data-lucide="arrow-big-up"></i>
-            </button>
-    </div>
-    <script src="index.js"></script>
-    
+  <main id="container-2" role="main">
+    <header>
+      <h1 id="heading">deepQuest</h1>
+      <div id="subHeadingBlock">
+        <h2 id="subheading">Research Anything</h2>
+        <i id="bookIcon" data-lucide="book-open-text" aria-hidden="true" title="Book Icon"></i>
+        <i id="linkIcon" data-lucide="link" aria-hidden="true" title="Link Icon"></i>
+      </div>
+    </header>
+
+    <section id="responseBlock" class="response-block" aria-live="polite">
+      <div id="stepsProgressContainer">
+        <ul id="stepsProgressList" role="list" aria-label="Progress Steps"></ul>
+      </div>
+      <p id="response" tabindex="-1" aria-label="Generated Research Response"></p>
+    </section>
+  </main>
+
+  <nav class="promptBlock" aria-label="Prompt input section">
+    <label for="prompt" class="sr-only">Enter a research topic</label>
+    <input type="text" id="prompt" name="prompt" placeholder="Ask anything" required aria-label="Research prompt input" />
+    <button id="submit" type="submit" aria-label="Submit research request">
+      <i id="buttonIcon" data-lucide="arrow-big-up" aria-hidden="true" title="Submit"></i>
+    </button>
+  </nav>
+
+  <script src="index.js"></script>
 </body>
 </html>
