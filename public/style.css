@@ -321,6 +321,59 @@ button:hover
 }
 
 .response-block.expanded {
+  height: auto;
+  /* max-height: 100%; */
+  opacity: 1;
+  transition: height 1s ease, opacity 0.5s ease;
+  /* overflow: visible; */
+}
+
+.response-block.collapsed {
   height: 500px;
-  transition: height 1s ease-out;
+  transition: height 1s ease, opacity 0.5s ease;
+  /* overflow: hidden; */
+}
+
+button.disabled {
+  background-color: #888;
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Faded prompt input block */
+.promptBlock.faded {
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+}
+
+/* Reposition promptBlock after generation starts */
+.promptBlock.reposition {
+  order: 4;
+  justify-self: flex-end;
+}
+
+/* Container class for flow adjustment */
+#container-2.start {
+  justify-content: flex-start;
+}
+
+#container-2.end{
+  height: max-content;
+}
+
+/* Fix for progress message positioning (class name corrected) */
+.progress-message {
+  position: absolute;
+  top: 60%;
+  left: 43%;
+  font-size: 1rem;
+  color: #ccc;
+}
+
+/* Additional spacing and alignment for link icon */
+.link-icon {
+  margin-left: 5px;
+  color: #00C4FF;
+  vertical-align: middle;
 }
